@@ -34,17 +34,22 @@ void fileOperator::segment(string file_name, int segment_num, string json_file) 
         cout << "segment_file --- " << segment_files[i] << endl;
     }
 
-    ifstream src_file_input(file_name);
+    ifstream src_file_input(file_name,ios::binary);
     // 输入文件大小
-    size_t src_file_size = file_size(src_file_input);
+    long long src_file_size = file_size(src_file_input);
     // 分片文件大小
-    size_t segment_size = src_file_size / segment_num;
+    long long segment_size = src_file_size / segment_num;
+    //cout<<"segment_num: "<<segment_num<<endl;
+    //cout<<src_file_size<<endl;
+    //cout<<segment_size<<endl;
 
     // 分片输出文件
     for (int i = 0; i < segment_num; i++) {
-        ofstream segment_file_output(segment_files[i]);
+        ofstream segment_file_output(segment_files[i],ios::binary);
+
         if (i == segment_num-1) {  // 最后一次，要将剩余文件片全部写入
-            size_t left_size = src_file_size % segment_size;
+            long long left_size = src_file_size % segment_size;
+            //cout<<segment_size + left_size<<endl;
             copy_file(src_file_input, segment_file_output, segment_size + left_size);
         } else {
             copy_file(src_file_input, segment_file_output, segment_size);
@@ -82,7 +87,7 @@ void fileOperator::merge(string json_file) {
     if (exist(src_file)) {
         src_file += ".copy";
     }
-    ofstream result(src_file);
+    ofstream result(src_file,ios::binary);
 
     // 文件分片数量
     int segment_num = j[kSegmentFileNum];
@@ -100,8 +105,8 @@ void fileOperator::merge(string json_file) {
     // 合并文件
     for (auto it = segment_files.begin(); it != segment_files.end(); it++) {
         cout << "copy file [" << *it << "]" << endl;
-        ifstream seg_input(*it);
-        size_t seg_input_size = file_size(seg_input);
+        ifstream seg_input(*it,ios::binary);
+        long long seg_input_size = file_size(seg_input);
         copy_file(seg_input, result, seg_input_size);
         seg_input.close();
     }
@@ -110,15 +115,17 @@ void fileOperator::merge(string json_file) {
     result.close();
 }
 
-void fileOperator::copy_file(ifstream &input, ofstream &output, size_t input_size) {
+void fileOperator::copy_file(ifstream &input, ofstream &output, long long input_size) {
     char* data = new char[kBlockSize];
-
-    for (size_t block = 0; block < input_size / kBlockSize; block++) {
+    cout<<"input_size: "<<input_size<<endl;
+    for (int block = 0; block < input_size / kBlockSize; block++) {
+        cout<<"kBlockSize:"<<kBlockSize<<endl;
         read_file_in_block(data, input);
         write_file_in_block(data, output);
     }
 
-    size_t left_size = input_size % kBlockSize;
+    int left_size = input_size % kBlockSize;
+    cout<<"left_size: "<<left_size<<endl;
     if (left_size != 0) {
         read_file_in_block(data, input, left_size);
         write_file_in_block(data, output, left_size);
@@ -134,8 +141,8 @@ bool fileOperator::exist(string name) {
 }
 
 
-size_t fileOperator::file_size(ifstream &file) {
-    size_t size;
+long long fileOperator::file_size(ifstream &file) {
+    long long size;
     file.seekg(0, std::ios::end);
     size = file.tellg();
     file.seekg(0, std::ios::beg);

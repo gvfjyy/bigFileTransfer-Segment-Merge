@@ -1,0 +1,28 @@
+QMainWindow{background-color:#ffffff;}
+
+
+#tabWidget{background-color:#f5f2ef;}
+#tab1{background-color:#f5f2ef;}
+#tab2{background-color:#f5f2ef;}
+#widget_page1_1{background-color:#f5f2ef;}
+#widget_page1_2{background-color:#f5f2ef;}
+#widget_page2_1{background-color:#f5f2ef;}
+#widget_page2_2{background-color:#f5f2ef;}
+QTableWidget{background-color:#f5f2ef;}
+
+
+
+#pushButton_page1_1{background-color:#e5322d;color:rgb(255,255,255);border-radius:6px;}
+#pushButton_page1_1:hover{background-color:black;color:rgb(255,255,255);}
+#pushButton_page1_4{background-color:#e5322d;color:rgb(255,255,255);border-radius:6px;}
+#pushButton_page1_4:hover{background-color:black;color:rgb(255,255,255);}
+#pushButton_page2_1{background-color:#e5322d;color:rgb(255,255,255);border-radius:6px;}
+#pushButton_page2_1:hover{background-color:black;color:rgb(255,255,255);}
+#pushButton_page2_3{background-color:#e5322d;color:rgb(255,255,255);border-radius:6px;}
+#pushButton_page2_3:hover{background-color:black;color:rgb(255,255,255);}
+
+
+#pushButton_page1_2{border:0px solid black;border-radius:1px;color:rgb(0,0,0);}
+#spinBox_page1_1{border:2px solid green;border-radius:4px;background-color:#ffffff;color:rgb(0,0,0);}
+#pushButton_page1_3{border-radius:3px;background-color:#8FBC8F;}
+#pushButton_page2_2{border-radius:3px;background-color:#8FBC8F;}

@@ -22,6 +22,7 @@ SOURCES += \
 
 HEADERS += \
     fileOperator.h \
+    json.h \
     mainwindow.h
 
 FORMS += \
