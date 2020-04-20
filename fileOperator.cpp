@@ -16,10 +16,11 @@ using json = nlohmann::json;
 void fileOperator::segment(string file_name, int segment_num, string json_file) {
 
     // 检查源文件是否存在
+    /*
     if (!exist(file_name)) {
         cout << "file [" << file_name << "] doesn't exist!" << endl;
         return;
-    }
+    }*/
 
     // 检查分片数量是否大于0
     if (segment_num <= 0) {
@@ -30,7 +31,7 @@ void fileOperator::segment(string file_name, int segment_num, string json_file) 
     // 分片文件名
     vector<string> segment_files;
     for (int i = 0; i < segment_num; i++) {
-        segment_files.push_back(file_name + to_string(i+1) + ".tmp");
+        segment_files.push_back(file_name + to_string(i+1) + ".deb");
         cout << "segment_file --- " << segment_files[i] << endl;
     }
 
@@ -71,11 +72,11 @@ void fileOperator::segment(string file_name, int segment_num, string json_file) 
 
 void fileOperator::merge(string json_file) {
     json j;
-
+    /*
     if (!exist(json_file)) {
         cout << "json file [" << json_file << "] doesn't exist!" << endl;
         return;
-    }
+    }*/
 
     ifstream json_input(json_file);
     json_input >> j;
@@ -84,9 +85,10 @@ void fileOperator::merge(string json_file) {
     string src_file = j[kSourceFileName];
 
     // 检查源文件是否已经存在
+    /*
     if (exist(src_file)) {
         src_file += ".copy";
-    }
+    }*/
     ofstream result(src_file,ios::binary);
 
     // 文件分片数量
@@ -95,12 +97,13 @@ void fileOperator::merge(string json_file) {
     vector<string> segment_files = j[kSegmentFiles];
 
     // 检查文件分片是否齐全
+    /*
     for (auto it = segment_files.begin(); it != segment_files.end(); ++it) {
         if (!exist(*it)) {
             cout << "segment file [" << *it << "] doesn't exist!" << endl;
             return;
         }
-    }
+    }*/
 
     // 合并文件
     for (auto it = segment_files.begin(); it != segment_files.end(); it++) {
@@ -117,15 +120,15 @@ void fileOperator::merge(string json_file) {
 
 void fileOperator::copy_file(ifstream &input, ofstream &output, long long input_size) {
     char* data = new char[kBlockSize];
-    cout<<"input_size: "<<input_size<<endl;
+    //cout<<"input_size: "<<input_size<<endl;
     for (int block = 0; block < input_size / kBlockSize; block++) {
-        cout<<"kBlockSize:"<<kBlockSize<<endl;
+        //cout<<"kBlockSize:"<<kBlockSize<<endl;
         read_file_in_block(data, input);
         write_file_in_block(data, output);
     }
 
     int left_size = input_size % kBlockSize;
-    cout<<"left_size: "<<left_size<<endl;
+    //cout<<"left_size: "<<left_size<<endl;
     if (left_size != 0) {
         read_file_in_block(data, input, left_size);
         write_file_in_block(data, output, left_size);
@@ -134,11 +137,11 @@ void fileOperator::copy_file(ifstream &input, ofstream &output, long long input_
     delete [] data;
     data = nullptr;
 }
-
+/*
 bool fileOperator::exist(string name) {
     struct stat buffer;
     return (stat(name.c_str(), &buffer) == 0);
-}
+}*/
 
 
 long long fileOperator::file_size(ifstream &file) {

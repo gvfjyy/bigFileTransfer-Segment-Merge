@@ -1,7 +1,8 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+RC_ICONS = logo.ico
 
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
@@ -17,11 +18,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     fileOperator.cpp \
+    filemergethread.cpp \
+    filesegmentthread.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     fileOperator.h \
+    filemergethread.h \
+    filesegmentthread.h \
     json.h \
     mainwindow.h
 
@@ -32,3 +37,5 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+

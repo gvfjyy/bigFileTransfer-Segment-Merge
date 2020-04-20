@@ -10,7 +10,7 @@ public:
     void segment(string file_name, int segment_num, string json_file="config.json");
     void merge(string json_file="config.json");
 private:
-    bool exist(string name);
+    //bool exist(string name);
     long long file_size(ifstream &file);
     void copy_file(ifstream &input, ofstream &output, long long input_size);
 

@@ -7,17 +7,17 @@
 #include <QFile>
 #include <QDebug>
 #include <QDir>
+#include <QDesktopServices>
+#include <QThreadPool>
 
-#include "json.h"
-#include "fileOperator.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <sys/stat.h>
-#include <exception>
+#include "filesegmentthread.h"
+#include "filemergethread.h"
 using namespace std;
-using json = nlohmann::json;
+
 
 
 QT_BEGIN_NAMESPACE
@@ -34,6 +34,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QThreadPool pool;
+
 
 public Q_SLOTS:
     void selectFilesOfSegment();
@@ -41,12 +43,19 @@ public Q_SLOTS:
     QString splitFileNameFromPath(QString path);
     void toDoSegment();
     void toDoMerge();
+    void openUrl(const QUrl& url);
 private:
     void updateTableWidgetOfPage1();
     void updateTableWidgetOfPage2();
 private:
     QStringList filesOfSegment;
     QStringList filesOfJson;
-    int sizeOfPerTmp;
+    int segmentedFile;
+    int mergedFile;
+    int sizeOfPerTmp;//切割后每个tmp文件的大小（MB）
+    void initCustomUI();//初始化代码添加的UI
+public://用于QRunnable通信
+    Q_INVOKABLE void refreshSegmentStatue(QString msg);
+    Q_INVOKABLE void refreshMergeStatue(QString msg);
 };
 #endif // MAINWINDOW_H

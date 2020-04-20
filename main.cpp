@@ -6,6 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+    w.setWindowTitle("GitHubTurbo.xyz");
     QFile file(QDir::currentPath()+"/style.qss");//发布时使用
     //QFile file("D:/imageRotate/style.qss");
 

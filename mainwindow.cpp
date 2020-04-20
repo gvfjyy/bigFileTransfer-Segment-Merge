@@ -6,10 +6,20 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    initCustomUI();
     QObject::connect(ui->pushButton_page1_1,SIGNAL(clicked()),this,SLOT(selectFilesOfSegment()));
     QObject::connect(ui->pushButton_page2_1,SIGNAL(clicked()),this,SLOT(selectFilesOfJson()));
     QObject::connect(ui->pushButton_page1_4,SIGNAL(clicked()),this,SLOT(toDoSegment()));
     QObject::connect(ui->pushButton_page2_3,SIGNAL(clicked()),this,SLOT(toDoMerge()));
+    ui->textBrowser->setOpenLinks(false);
+    connect(ui->textBrowser, SIGNAL(anchorClicked(const QUrl&)),this, SLOT(openUrl(const QUrl&)));
+    pool.setMaxThreadCount(4);
+}
+
+void MainWindow::initCustomUI(){
+    ui->statusBar->setMinimumWidth(this->width());
+    ui->pushButton_page1_3->setVisible(false);
+    ui->pushButton_page2_2->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -17,39 +27,53 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::openUrl(const QUrl& url){
+    QDesktopServices::openUrl(url);
+}
+
 string qstr2str(const QString qstr)
 {
     QByteArray cdata = qstr.toLocal8Bit();
     return string(cdata);
 }
-
+void MainWindow::refreshSegmentStatue(QString msg){
+    ui->pushButton_page1_3->setText(msg);
+    this->segmentedFile+=1;
+    QString message = "Segment: "+QString::number(this->segmentedFile)+"/"+QString::number(this->filesOfSegment.size());
+    ui->statusBar->showMessage(message);
+    if(this->segmentedFile==this->filesOfSegment.size()){
+        QMessageBox::information(nullptr, "Notice", "Segment Finish!", QMessageBox::Yes | QMessageBox::Yes);
+    }
+}
+void MainWindow::refreshMergeStatue(QString msg){
+    ui->pushButton_page2_2->setText(msg);
+    this->mergedFile+=1;
+    QString message = "Segment: "+QString::number(this->mergedFile)+"/"+QString::number(this->filesOfJson.size());
+    ui->statusBar->showMessage(message);
+    if(this->mergedFile==this->filesOfJson.size()){
+        QMessageBox::information(nullptr, "Notice", "Merge Finish!", QMessageBox::Yes | QMessageBox::Yes);
+    }
+}
 void MainWindow::toDoSegment(){
+    ui->statusBar->showMessage("Segment Start!");
+    this->segmentedFile = 0;
     if(this->filesOfSegment.size()==0) return;
     this->sizeOfPerTmp = ui->spinBox_page1_1->value();
     for(int i=0;i<this->filesOfSegment.size();i++){
-        ui->pushButton_page1_3->setText("正在处理:"+QString::number(i+1)+"/"+QString::number(this->filesOfSegment.size()));
-        qApp->processEvents();
-        int segmentNum = (QFile(this->filesOfSegment[i]).size()/(this->sizeOfPerTmp*1024*1024))+1;
-        fileOperator  tmp;
-        tmp.segment(qstr2str(splitFileNameFromPath(this->filesOfSegment[i])),segmentNum,qstr2str((splitFileNameFromPath(this->filesOfSegment[i])+".json")));
+        int segmentNum = int(QFile(this->filesOfSegment[i]).size()/(this->sizeOfPerTmp*1024*1024))+1;
+        string inputFileName = qstr2str(splitFileNameFromPath(this->filesOfSegment[i]));
+        string outputJsonFileName = qstr2str((splitFileNameFromPath(this->filesOfSegment[i])+".conf"));
+        pool.start(new fileSegmentThread(this,inputFileName,segmentNum,outputJsonFileName));
     }
-    qDebug()<<"finish:toSegment"<<endl;
-    ui->pushButton_page1_3->setText("分割完成");
-    QMessageBox::information(NULL, "通知","分割完成",QMessageBox::Yes | QMessageBox::No,QMessageBox::Yes);
     return;
 }
 void MainWindow::toDoMerge(){
+    ui->statusBar->showMessage("Merge Start");
+    this->mergedFile = 0;
     if(this->filesOfJson.size()==0) return;
     for(int i=0;i<this->filesOfJson.size();i++){
-        ui->pushButton_page2_2->setText("正在处理:"+QString::number(i+1)+"/"+QString::number(this->filesOfJson.size()));
-        qApp->processEvents();
-        fileOperator tmp;
-        qDebug()<<splitFileNameFromPath(this->filesOfJson[i])<<endl;
-        tmp.merge(qstr2str(splitFileNameFromPath(this->filesOfJson[i])));
+        pool.start(new fileMergeThread(this,qstr2str(splitFileNameFromPath(this->filesOfJson[i]))));
     }
-    qDebug()<<"finish:toDoMerge"<<endl;
-    ui->pushButton_page2_2->setText("合并完成");
-    QMessageBox::information(NULL, "通知","合并完成",QMessageBox::Yes | QMessageBox::No,QMessageBox::Yes);
     return;
 }
 
@@ -60,7 +84,7 @@ void MainWindow::selectFilesOfSegment(){
 }
 
 void MainWindow::selectFilesOfJson(){
-    this->filesOfJson = QFileDialog::getOpenFileNames(this,tr("文件选择"),tr("/home"),tr("json文件(*.json)"));
+    this->filesOfJson = QFileDialog::getOpenFileNames(this,tr("文件选择"),tr("/home"),tr("json文件(*.conf)"));
     updateTableWidgetOfPage2();
 }
 
