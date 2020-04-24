@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    w.setWindowTitle("GitHubTurbo.xyz");
+    w.setWindowTitle("FileSegmentMerge");
     QFile file(QDir::currentPath()+"/style.qss");//发布时使用
     //QFile file("D:/imageRotate/style.qss");
 
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        QMessageBox::warning(NULL, "warning","openStyleSheetFailure",QMessageBox::Yes | QMessageBox::No,QMessageBox::Yes);
+        QMessageBox::warning(nullptr, "warning","openStyleSheetFailure",QMessageBox::Yes | QMessageBox::No,QMessageBox::Yes);
     }
     w.show();
     return a.exec();

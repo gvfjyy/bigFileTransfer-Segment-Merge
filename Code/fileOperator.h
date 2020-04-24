@@ -22,6 +22,7 @@ private:
         //cout<<"write: "<<size<<endl;
         output.write(data, size);
     }
+    string splitPath(string path,int flag);
 private:
     // json key
     static const string kSegmentFileNum;

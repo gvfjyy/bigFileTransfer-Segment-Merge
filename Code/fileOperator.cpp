@@ -13,6 +13,22 @@ using json = nlohmann::json;
  const string fileOperator::kSegmentFiles = "SegmentFiles";
  const int fileOperator::kBlockSize = 1024 * 1024;  // 1MB
 
+
+ string fileOperator::splitPath(string path,int flag){
+     string result;
+     int indexOfFinalLine=0;
+     for(int i=0;i<path.length();i++){
+         if(path[i]=='/' || path[i]=='\\') indexOfFinalLine = i;
+     }
+     if(indexOfFinalLine==0) return path;
+     if(flag==2){
+         return path.substr(indexOfFinalLine+1);
+     }
+     if(flag==1){
+         return path.substr(0,indexOfFinalLine+1);
+     }
+     return result;
+ }
 void fileOperator::segment(string file_name, int segment_num, string json_file) {
 
     // 检查源文件是否存在
@@ -29,6 +45,7 @@ void fileOperator::segment(string file_name, int segment_num, string json_file) 
     }
 
     // 分片文件名
+
     vector<string> segment_files;
     for (int i = 0; i < segment_num; i++) {
         segment_files.push_back(file_name + to_string(i+1) + ".deb");
@@ -62,6 +79,10 @@ void fileOperator::segment(string file_name, int segment_num, string json_file) 
 
     ofstream json_output(json_file);
     json j;
+    file_name = splitPath(file_name,2);
+    for(int i=0;i<segment_files.size();i++){
+        segment_files[i] = splitPath(segment_files[i],2);
+    }
     j[kSegmentFileNum] = segment_num;
     j[kSourceFileName] = file_name;
     j[kSegmentFiles] = segment_files;
@@ -83,6 +104,8 @@ void fileOperator::merge(string json_file) {
 
     // 源文件名
     string src_file = j[kSourceFileName];
+    src_file = splitPath(json_file,1)+src_file;
+    cout<<src_file<<endl;
 
     // 检查源文件是否已经存在
     /*
@@ -95,6 +118,11 @@ void fileOperator::merge(string json_file) {
     int segment_num = j[kSegmentFileNum];
     // 分片文件名
     vector<string> segment_files = j[kSegmentFiles];
+    for(int i=0;i<segment_files.size();i++){
+        string tmp = splitPath(json_file,1)+segment_files[i];
+        segment_files[i] = tmp;
+        cout<<tmp;
+    }
 
     // 检查文件分片是否齐全
     /*

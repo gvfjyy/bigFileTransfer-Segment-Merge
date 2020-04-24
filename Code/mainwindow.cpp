@@ -61,8 +61,10 @@ void MainWindow::toDoSegment(){
     this->sizeOfPerTmp = ui->spinBox_page1_1->value();
     for(int i=0;i<this->filesOfSegment.size();i++){
         int segmentNum = int(QFile(this->filesOfSegment[i]).size()/(this->sizeOfPerTmp*1024*1024))+1;
-        string inputFileName = qstr2str(splitFileNameFromPath(this->filesOfSegment[i]));
-        string outputJsonFileName = qstr2str((splitFileNameFromPath(this->filesOfSegment[i])+".conf"));
+        //string inputFileName = qstr2str(splitFileNameFromPath(this->filesOfSegment[i]));
+        //string outputJsonFileName = qstr2str((splitFileNameFromPath(this->filesOfSegment[i])+".conf"));
+        string inputFileName = qstr2str(this->filesOfSegment[i]);
+        string outputJsonFileName = qstr2str((this->filesOfSegment[i])+".conf");
         pool.start(new fileSegmentThread(this,inputFileName,segmentNum,outputJsonFileName));
     }
     return;
@@ -72,7 +74,8 @@ void MainWindow::toDoMerge(){
     this->mergedFile = 0;
     if(this->filesOfJson.size()==0) return;
     for(int i=0;i<this->filesOfJson.size();i++){
-        pool.start(new fileMergeThread(this,qstr2str(splitFileNameFromPath(this->filesOfJson[i]))));
+        //pool.start(new fileMergeThread(this,qstr2str(splitFileNameFromPath(this->filesOfJson[i]))));
+        pool.start(new fileMergeThread(this,qstr2str(this->filesOfJson[i])));
     }
     return;
 }
